@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block title %}Вход{% endblock %}{% block content %}
+<!-- Токен связывает отправленную форму с текущей сессией браузера. -->
+<section class="auth"><p class="eyebrow">РАБОЧЕЕ ПРОСТРАНСТВО</p><h1>С возвращением</h1><p class="muted">Войдите, чтобы открыть свой личный кабинет.</p><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Логин<input name="username" autocomplete="username" required maxlength="40"></label><label>Пароль<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label><button>Войти в кабинет →</button></form><p class="muted">Нет аккаунта? <a href="{{ url_for('auth.register') }}">Зарегистрироваться</a></p></section>
+{% endblock %}

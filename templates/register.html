@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block title %}Регистрация{% endblock %}{% block content %}
+<!-- Ограничения полей дополнительно проверяются на сервере. -->
+<section class="auth"><p class="eyebrow">НАЧАЛО РАБОТЫ</p><h1>Создать аккаунт</h1><p class="muted">Ваши данные доступны только вам.</p><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Логин<input name="username" autocomplete="username" required minlength="3" maxlength="40" pattern="[A-Za-z0-9_]+"><small>3–40 латинских букв, цифр или _</small></label><label>Email<input name="email" type="email" autocomplete="email" required maxlength="254"></label><label>Пароль<input name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="128"><small>От 12 до 128 символов</small></label><button>Создать аккаунт →</button></form><p class="muted">Уже зарегистрированы? <a href="{{ url_for('auth.login') }}">Войти</a></p></section>
+{% endblock %}

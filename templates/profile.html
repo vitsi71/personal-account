@@ -1,0 +1,17 @@
+{% extends 'base.html' %}{% block content %}
+<!-- Сервер передаёт только напоминания владельца; Jinja2 экранирует их текст. -->
+<p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p><h1>Здравствуйте, {{ g.user.username }}</h1><p class="muted">Ваш профиль, напоминания и уведомления в одном месте.</p>
+<div class="grid"><section class="card"><h2>Данные аккаунта</h2><dl><dt>Логин</dt><dd>{{ g.user.username }}</dd><dt>Email</dt><dd>{{ g.user.email }}</dd><dt>Дата регистрации</dt><dd><time data-local-time datetime="{{ g.user.created_at.isoformat() }}Z">{{ g.user.created_at.strftime('%d.%m.%Y %H:%M') }} UTC</time></dd></dl><h2>Настройки доступа</h2><p class="muted">Сессия действует 8 часов. Кнопка «Выйти» немедленно завершает текущую сессию.</p></section>
+<section class="card"><h2>Новое напоминание</h2><form id="reminder-form" action="{{ url_for('add_reminder') }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="due_at"><label>Сообщение<textarea name="message" required maxlength="500" rows="3" placeholder="Что нужно сделать?"></textarea></label>
+<!-- Календарь показывает местное время; JavaScript отправляет серверу дату в UTC. -->
+<label for="due-local">Дата и время<input id="due-local" name="due_local" type="datetime-local" lang="ru" required min="0001-01-01T00:00" max="9999-12-31T23:59" aria-describedby="date-preview timezone-hint"></label><small id="date-preview" aria-live="polite">Выберите дату и время по часам вашего компьютера.</small><p class="muted"><small id="timezone-hint" data-timezone>Местное время компьютера</small></p><noscript><p class="notice error">Включите JavaScript для выбора местного времени и создания напоминаний.</p></noscript><button>Добавить напоминание</button></form></section></div>
+<!-- Статусы обновляются автоматически, не прерывая заполнение новой формы. -->
+<dialog id="live-notification" aria-labelledby="notification-title" aria-describedby="live-notification-text">
+  <p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p><h2 id="notification-title">Напоминание</h2>
+  <p id="live-notification-text" aria-live="assertive"></p>
+  <form method="dialog"><button autofocus>Понятно</button></form>
+</dialog>
+<p id="notification-connection" role="status"></p>
+<section class="card" data-notifications-url="{{ url_for('notifications') }}"><h2>Мои напоминания <span class="badge">{{ reminders|length }}</span></h2><p class="muted">Проверка раз в минуту, через 2 секунды после её начала. Новое напоминание появляется во всплывающем окне.</p>{% for reminder in reminders %}<article class="reminder" data-reminder-id="{{ reminder.id }}" {% if not reminder.delivered_at %}data-pending{% endif %}><div><span class="status">{{ 'Уведомление доставлено' if reminder.delivered_at else 'Ожидает отправки' }}</span><p>{{ reminder.message }}</p><small><time data-local-time datetime="{{ reminder.due_at.isoformat() }}Z">{{ reminder.due_at.strftime('%d.%m.%Y %H:%M') }} UTC</time></small></div><form action="{{ url_for('delete_reminder', reminder_id=reminder.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="secondary">Удалить</button></form></article>{% else %}<p class="empty">Пока ничего нет. Добавьте первое напоминание.</p>{% endfor %}</section>
+<script type="module" src="{{ url_for('static', filename='notifications.mjs') }}"></script>
+{% endblock %}
